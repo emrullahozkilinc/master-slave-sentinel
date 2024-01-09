@@ -50,7 +50,7 @@ services:
     networks:
       - redis-1
     volumes:
-      - ./conf/sentinel.conf:/usr/local/etc/redis/sentinel.conf
+      - ./conf:/usr/local/etc/redis
     command: ["redis-sentinel", "/usr/local/etc/redis/sentinel.conf"]
   redis-sentinel-2:
     container_name: redis-sentinel-2
@@ -65,7 +65,7 @@ services:
     networks:
       - redis-1
     volumes:
-      - ./conf/sentinel.conf:/usr/local/etc/redis/sentinel.conf
+      - ./conf:/usr/local/etc/redis
     command: ["redis-sentinel", "/usr/local/etc/redis/sentinel.conf"]
   redis-sentinel-3:
     container_name: redis-sentinel-3
@@ -80,8 +80,24 @@ services:
     networks:
       - redis-1
     volumes:
-      - ./conf/sentinel.conf:/usr/local/etc/redis/sentinel.conf
+      - ./conf:/usr/local/etc/redis
     command: ["redis-sentinel", "/usr/local/etc/redis/sentinel.conf"]
+  spring-app:
+    container_name: spring-app
+    build: .
+    image: spring-app
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2
+      - redis-slave3
+      - redis-sentinel-1
+      - redis-sentinel-2
+      - redis-sentinel-3
+    networks:
+      - redis-1
+    ports:
+      - "8085:8080"
 
 networks:
   redis-1:
